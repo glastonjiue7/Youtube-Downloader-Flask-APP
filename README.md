@@ -1,6 +1,6 @@
 # ARK10.ai Youtube Downloader
 
-This is a Flask-based web application for downloading YouTube videos using . It features a simple UI where users can enter a YouTube video link and view a live progress bar as the video downloads.
+This is a Flask-based web application for downloading YouTube videos/audio with quality options. It features a simple UI where users can enter a YouTube video link and view a live progress bar as the video downloads.
 
 ## 🚀 Features
 
