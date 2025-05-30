@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ARK10.ai Youtube Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #111827;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        progress {
+            width: 100%;
+            height: 20px;
+            margin-top: 10px;
+        }
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function downloadVideo() {
+            const link = document.getElementById('youtubeLink').value;
+            const format = document.getElementById('formatSelect').value;
+
+            if (!link) {
+                alert("Please enter a YouTube link.");
+                return;
+            }
+
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressText').style.display = 'inline';
+
+            fetch('/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ link: link, format: format })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const videoId = data.video_id;
+                checkProgress(videoId);
+            });
+        }
+
+        function checkProgress(videoId) {
+            const interval = setInterval(() => {
+                fetch(`/progress/${videoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const progress = data.progress;
+                    document.getElementById('progressBar').value = progress;
+                    document.getElementById('progressText').innerText = progress.toFixed(1) + '%';
+                    if (progress >= 100 || progress === -1) {
+                        clearInterval(interval);
+                        if (progress === 100) {
+                            alert("Download completed!");
+                            
+                        } else {
+                            alert("Download failed!");
+                        }
+                    }
+                });
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <img src="/static/ark10.jpeg" alt="ARK10 Logo" class="logo">
+        <h1>ARK10.ai Youtube Downloader</h1>
+        <input type="text" id="youtubeLink" placeholder="Enter YouTube link">
+        <select id="formatSelect">
+            <option value="best">Best Quality</option>
+            <option value="audio">Audio Only (MP3)</option>
+            <option value="18">360p (Format 18)</option>
+            <option value="22">720p (Format 22)</option>
+        </select>
+        <button onclick="downloadVideo()">Download</button>
+        <progress id="progressBar" value="0" max="100" style="display: none;"></progress>
+        <div id="progressText">0%</div>
+    </div>
+</body>
+</html>
+
